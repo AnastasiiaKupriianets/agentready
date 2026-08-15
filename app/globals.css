@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #0a0b0c;
+  --color-surface: #111314;
+  --color-line: rgba(255, 255, 255, 0.09);
+  --color-line-strong: rgba(255, 255, 255, 0.16);
+
+  --color-ink: #f2f3f2;
+  --color-ink-dim: #9a9f9c;
+  --color-ink-faint: #5f6462;
+
+  --color-green: #35e0a1;
+  --color-green-dim: rgba(53, 224, 161, 0.12);
+  --color-amber: #f2a93c;
+  --color-amber-dim: rgba(242, 169, 60, 0.12);
+  --color-red: #f2604c;
+  --color-red-dim: rgba(242, 96, 76, 0.12);
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+
+  --color-ink: var(--color-ink);
+  --color-ink-dim: var(--color-ink-dim);
+  --color-ink-faint: var(--color-ink-faint);
+
+  --color-green: var(--color-green);
+  --color-green-dim: var(--color-green-dim);
+  --color-amber: var(--color-amber);
+  --color-amber-dim: var(--color-amber-dim);
+  --color-red: var(--color-red);
+  --color-red-dim: var(--color-red-dim);
+
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* faint background grid, matches hero mockup */
+.bg-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, black 10%, transparent 70%);
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, black 10%, transparent 70%);
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2.2s ease-in-out infinite;
+}
