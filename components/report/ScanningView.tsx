@@ -8,6 +8,7 @@ const STEPS = [
   "Checking navigation",
   "Analyzing forms and actions",
   "Reading structured data",
+  "Reasoning about ambiguous controls",
   "Evaluating agent accessibility",
 ];
 

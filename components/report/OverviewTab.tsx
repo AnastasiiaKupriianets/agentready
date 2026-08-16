@@ -1,6 +1,7 @@
 import type { AnalyzeApiResult } from "@/lib/apiTypes";
 import type { CategoryChecks } from "@/lib/rules";
 import { ScoreGauge } from "@/components/ScoreGauge";
+import { AiAnalysisSection } from "./AiAnalysisSection";
 import type { ReportTab } from "./ReportHeader";
 
 function worstCheckSummary(cat: CategoryChecks): string {
@@ -112,6 +113,8 @@ export function OverviewTab({
           })}
         </div>
       </div>
+
+      <AiAnalysisSection ai={result.aiAnalysis} />
 
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button

@@ -152,3 +152,47 @@ z przykładami z samej strony (np. link "Reload" bez href).
   - **JSON (.json)** — surowa odpowiedź API 1:1 (przydatne pod przyszłe porównania/CI z ETAP 10/CLI).
 
 `lib/exportReport.ts` — `buildMarkdownReport()` + `downloadTextFile()` (Blob, bez zależności).
+
+## AI Agent Analysis (Groq)
+
+Adds a contextual AI layer *on top of* the deterministic ARS engine — it never touches the
+0–100 score, and the full audit still works with zero AI calls if the key is missing or the
+API is down.
+
+**Setup:** copy `.env.local.example` to `.env.local` and set `GROQ_API_KEY` (get one at
+console.groq.com). Restart `npm run dev` after adding it.
+
+```
+lib/ai/
+  provider.ts          — AiProvider interface (explainControl). Swapping providers later
+                           means adding one new file implementing this — zero changes to
+                           lib/rules, lib/scoring, or lib/issues.
+  groqProvider.ts        — Groq implementation. Model: openai/gpt-oss-20b (llama-3.3-70b-versatile
+                            was deprecated June 2026). response_format: json_object, 6s timeout,
+                            strict runtime validation of the parsed JSON shape — any malformed
+                            or missing field discards that one insight instead of crashing.
+  selectCandidates.ts     — picks up to 3 real ambiguous buttons (no accessible name, or text
+                             matching the same AMBIGUOUS_ACTION_PHRASES list the deterministic
+                             engine uses), deduplicated by text. Real DOM context only:
+                             controlText + nearestHeading (computed in lib/parser.ts by walking
+                             headings+buttons together in document order — not fabricated
+                             proximity) + pageTitle. No full-page HTML is ever sent.
+  index.ts                 — runAiAnalysis(): wraps everything in try/catch, returns
+                              {available:false, insights:[]} on any failure — including no
+                              API key configured. Never throws, so a broken AI layer can never
+                              take down the deterministic audit.
+```
+
+`POST /api/analyze` response gains `aiAnalysis: { available, insights[] }`. UI:
+`components/report/AiAnalysisSection.tsx` on the Overview tab — violet accent (distinct from
+the green/amber/red ARS palette), explicitly labeled "AI-generated · not part of the ARS score",
+renders nothing at all when there's nothing to show (no key, or no ambiguous controls found).
+
+**Tested in this sandbox** (api.groq.com isn't reachable from here, so this exercises exactly
+the failure paths that matter):
+- No `GROQ_API_KEY` → `aiAnalysis: {available: false, insights: []}`, rest of report unaffected.
+- `GROQ_API_KEY` set but endpoint unreachable → fails fast (~900ms, not the 6s timeout),
+  `aiAnalysis: {available: true, insights: []}`, score/issues/report fully intact.
+
+**Not yet tested:** an actual successful Groq response, since that needs your real key and
+this sandbox can't reach api.groq.com. Test that path locally with `npm run dev`.

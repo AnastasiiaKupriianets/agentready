@@ -34,14 +34,13 @@ export function Hero() {
       </p>
 
       <form className="mx-auto mt-10 flex max-w-[640px] flex-col gap-3 sm:flex-row" onSubmit={handleAnalyze}>
-        <div className="flex h-13 flex-1 items-center gap-0.5 border border-line-strong bg-surface px-4 focus-within:border-green focus-within:shadow-[0_0_0_3px_var(--color-green-dim)]">
-          <span className="font-mono text-sm text-ink-faint">https://</span>
+        <div className="flex h-13 flex-1 items-center border border-line-strong bg-surface px-4 focus-within:border-green focus-within:shadow-[0_0_0_3px_var(--color-green-dim)]">
           <input
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="acme-shop.com"
-            className="h-13 flex-1 bg-transparent pl-1 font-mono text-sm text-ink outline-none placeholder:text-ink-faint"
+            placeholder="acme-shop.com or http://localhost:3000/test-page.html"
+            className="h-13 w-full bg-transparent font-mono text-sm text-ink outline-none placeholder:text-ink-faint"
           />
         </div>
         <button

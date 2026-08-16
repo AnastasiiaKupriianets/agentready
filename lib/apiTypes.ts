@@ -3,6 +3,7 @@ import type { CategoryChecks } from "./rules";
 import type { ScoringResult } from "./scoring";
 import type { Issue } from "./issues";
 import type { AgentViewSection } from "./agentView";
+import type { AiAnalysisResult } from "./ai";
 
 export interface AnalyzeApiResult {
   url: string;
@@ -16,6 +17,7 @@ export interface AnalyzeApiResult {
   issues: Issue[];
   agentView: AgentViewSection[];
   agentViewMeta: { nodeCount: number; unreadableCount: number };
+  aiAnalysis: AiAnalysisResult;
 }
 
 export interface AnalyzeApiError {

@@ -21,6 +21,8 @@ export interface ButtonNode {
   disabled: boolean;
   hasExposedState: boolean;
   containsIcon: boolean;
+  /** Text of the nearest preceding heading in document order, or null. Real DOM proximity, not a guess. */
+  nearestHeading: string | null;
 }
 
 export interface FormFieldNode {
@@ -152,6 +154,21 @@ export function parsePage(html: string, baseUrl: string): ParsedPage {
     });
   });
 
+  const headingBeforeButton = new Map<Element, string | null>();
+  {
+    let lastHeading: string | null = null;
+    $("h1, h2, h3, h4, h5, h6, button, [role='button'], input[type='submit'], input[type='button']").each(
+      (_, el) => {
+        if (/^h[1-6]$/.test(el.tagName)) {
+          const text = $(el).text().trim();
+          if (text) lastHeading = text;
+        } else {
+          headingBeforeButton.set(el, lastHeading);
+        }
+      }
+    );
+  }
+
   const buttons: ButtonNode[] = [];
   $('button, [role="button"], input[type="submit"], input[type="button"]').each((_, el) => {
     const $el = $(el);
@@ -172,6 +189,7 @@ export function parsePage(html: string, baseUrl: string): ParsedPage {
       disabled,
       hasExposedState,
       containsIcon,
+      nearestHeading: headingBeforeButton.get(el) ?? null,
     });
   });
 

@@ -16,6 +16,9 @@
   --color-amber-dim: rgba(242, 169, 60, 0.12);
   --color-red: #f2604c;
   --color-red-dim: rgba(242, 96, 76, 0.12);
+
+  --color-ai: #a78bfa;
+  --color-ai-dim: rgba(167, 139, 250, 0.12);
 }
 
 @theme inline {
@@ -34,6 +37,9 @@
   --color-amber-dim: var(--color-amber-dim);
   --color-red: var(--color-red);
   --color-red-dim: var(--color-red-dim);
+
+  --color-ai: var(--color-ai);
+  --color-ai-dim: var(--color-ai-dim);
 
   --font-display: var(--font-space-grotesk);
   --font-sans: var(--font-manrope);

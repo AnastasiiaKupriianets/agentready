@@ -5,6 +5,7 @@ import { runAllChecks, groupChecksByCategory } from "@/lib/rules";
 import { computeScoring } from "@/lib/scoring";
 import { buildIssues } from "@/lib/issues";
 import { buildAgentView, countNodes, countUnreadable } from "@/lib/agentView";
+import { runAiAnalysis } from "@/lib/ai";
 
 function normalizeUrl(input: string): URL | null {
   const trimmed = input.trim();
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
   const scoring = computeScoring(parsed, categories);
   const issues = buildIssues(categories, parsed);
   const agentView = buildAgentView(parsed);
+  const aiAnalysis = await runAiAnalysis(parsed);
 
   return NextResponse.json({
     url: target.toString(),
@@ -56,5 +58,6 @@ export async function POST(req: NextRequest) {
       nodeCount: countNodes(agentView),
       unreadableCount: countUnreadable(agentView),
     },
+    aiAnalysis,
   });
 }
