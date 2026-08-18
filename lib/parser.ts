@@ -76,6 +76,26 @@ export interface ParsedPage {
   };
 }
 
+/**
+ * Like $el.text(), but joins sibling/child text with spaces. Plain .text()
+ * concatenates every descendant text node with nothing between them, so
+ * markup like <span>Foo</span><span>Bar</span> (common in real-world
+ * component-heavy sites) reads as "FooBar" instead of "Foo Bar".
+ */
+function readableText($el: Cheerio<Element>, $: CheerioAPI): string {
+  const parts: string[] = [];
+  $el.contents().each((_, node) => {
+    if (node.type === "text") {
+      const t = $(node).text().trim();
+      if (t) parts.push(t);
+    } else if (node.type === "tag") {
+      const t = readableText($(node) as Cheerio<Element>, $);
+      if (t) parts.push(t);
+    }
+  });
+  return parts.join(" ").replace(/\s+/g, " ").trim();
+}
+
 function accessibleName($el: Cheerio<Element>, $: CheerioAPI): string {
   const ariaLabel = $el.attr("aria-label");
   if (ariaLabel?.trim()) return ariaLabel.trim();
@@ -84,13 +104,13 @@ function accessibleName($el: Cheerio<Element>, $: CheerioAPI): string {
   if (labelledBy) {
     const text = labelledBy
       .split(/\s+/)
-      .map((id) => $(`#${id}`).text().trim())
+      .map((id) => readableText($(`#${id}`) as Cheerio<Element>, $))
       .filter(Boolean)
       .join(" ");
     if (text) return text;
   }
 
-  return $el.text().trim();
+  return readableText($el, $);
 }
 
 function resolveHref(href: string | undefined, baseUrl: string): string | null {
@@ -109,7 +129,7 @@ function resolveHref(href: string | undefined, baseUrl: string): string | null {
 export function parsePage(html: string, baseUrl: string): ParsedPage {
   const $ = cheerio.load(html);
 
-  const title = $("title").first().text().trim() || null;
+  const title = readableText($("title").first(), $) || null;
   const metaDescription = $('meta[name="description"]').attr("content")?.trim() || null;
   const canonical = resolveHref($('link[rel="canonical"]').attr("href"), baseUrl);
 
@@ -124,7 +144,7 @@ export function parsePage(html: string, baseUrl: string): ParsedPage {
   $("h1, h2, h3, h4, h5, h6").each((_, el) => {
     headings.push({
       level: Number(el.tagName.slice(1)),
-      text: $(el).text().trim(),
+      text: readableText($(el), $),
     });
   });
 
@@ -160,7 +180,7 @@ export function parsePage(html: string, baseUrl: string): ParsedPage {
     $("h1, h2, h3, h4, h5, h6, button, [role='button'], input[type='submit'], input[type='button']").each(
       (_, el) => {
         if (/^h[1-6]$/.test(el.tagName)) {
-          const text = $(el).text().trim();
+          const text = readableText($(el), $);
           if (text) lastHeading = text;
         } else {
           headingBeforeButton.set(el, lastHeading);

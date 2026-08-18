@@ -140,7 +140,9 @@ export function OverviewTab({
             <span className="font-mono text-2xl text-green">{projectedScore}</span>
           </div>
           <p className="mt-2 font-sans text-xs leading-relaxed text-ink-dim">
-            If every fixable issue below were resolved. {result.issues.length} fix(es) available.
+            {result.issues.length === 0
+              ? "Nothing to fix — every checkable item on this page passed."
+              : `If every fixable issue below were resolved. ${result.issues.length} fix(es) available.`}
           </p>
           <span className="mt-3 inline-block font-mono text-xs text-green">See recommendations →</span>
         </button>

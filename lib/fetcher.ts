@@ -41,6 +41,21 @@ export async function fetchWebsite(url: string): Promise<FetchResult> {
     });
 
     if (!res.ok) {
+      if (res.status === 403 || res.status === 401) {
+        return {
+          ok: false,
+          error:
+            "This site blocked the request (403). Many sites reject automated/bot traffic — this isn't something AgentReady can work around, and it's worth noting agents hit the same wall.",
+          status: res.status,
+        };
+      }
+      if (res.status === 429) {
+        return {
+          ok: false,
+          error: "This site rate-limited the request (429). Wait a moment and try again.",
+          status: res.status,
+        };
+      }
       return {
         ok: false,
         error: `Site responded with ${res.status} ${res.statusText}.`,

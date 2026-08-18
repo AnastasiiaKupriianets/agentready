@@ -87,7 +87,7 @@ export function ReportHeader({
 
   return (
     <div className="pt-14">
-      <a href={result.finalUrl} className="font-mono text-sm text-green hover:underline">
+      <a href={result.finalUrl} className="break-all font-mono text-sm text-green hover:underline">
         {result.finalUrl}
       </a>
 

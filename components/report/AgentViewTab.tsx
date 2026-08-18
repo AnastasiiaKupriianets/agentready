@@ -52,7 +52,7 @@ export function AgentViewTab({
                 >
                   <span className="text-ink-faint">→</span>
                   <span className="w-12 flex-none text-ink-faint">{nodeIcon(node.kind)}</span>
-                  <span className="text-ink">{node.detail}</span>
+                  <span className="min-w-0 break-all text-ink">{node.detail}</span>
                   {node.flag && (
                     <span
                       className={`ml-auto border px-1.5 py-0.5 text-[10px] ${

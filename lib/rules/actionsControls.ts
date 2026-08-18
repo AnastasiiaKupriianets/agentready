@@ -58,37 +58,23 @@ export function runActionsControlsChecks(page: ParsedPage): CheckResult[] {
   );
 
   // Control state is exposed — 4 pts
-  const statefulCandidates = page.buttons.filter((b) => b.disabled || b.hasExposedState);
-  if (statefulCandidates.length === 0 && page.buttons.length === 0) {
-    checks.push(
-      makeNotApplicable({
-        id: "actions.state-exposed",
-        category,
-        label: "Control state is programmatically exposed",
-        maxPoints: 4,
-        limitation: "No buttons found on the page.",
-      })
-    );
-  } else {
-    // We can only confirm state IS exposed where it's present; we can't detect
-    // "this control has state that should be exposed but isn't" from static HTML alone
-    // (that requires knowing the control's intended behavior). Score on the
-    // ratio of interactive controls that expose any state vs total, as a
-    // coarse but honest proxy.
-    const verdicts: ItemVerdict[] = page.buttons.map((b): ItemVerdict =>
-      b.hasExposedState ? "pass" : "partial"
-    );
-    checks.push(
-      makeCheck({
-        id: "actions.state-exposed",
-        category,
-        label: "Control state is programmatically exposed",
-        maxPoints: 4,
-        verdicts,
-        detail: `${statefulCandidates.length}/${page.buttons.length} button(s) expose disabled/expanded/checked/selected/pressed state via attributes.`,
-      })
-    );
-  }
+  // Cross-site testing showed the previous heuristic (flag any button
+  // without an ARIA state attribute) fired on nearly every button on nearly
+  // every site — including well-built ones like linear.app. Most buttons
+  // genuinely don't need exposed state; only toggles, expandable controls,
+  // and similar need it, and static HTML can't reliably tell which buttons
+  // those are without more signal than we have. Marking this n/a is more
+  // honest than a check that never meaningfully passes.
+  checks.push(
+    makeNotApplicable({
+      id: "actions.state-exposed",
+      category,
+      label: "Control state is programmatically exposed",
+      maxPoints: 4,
+      limitation:
+        "Static analysis can't reliably tell which controls are expected to expose state (toggles, expandable panels) versus ordinary action buttons that don't need it.",
+    })
+  );
 
   // Critical (destructive) actions are distinguishable — 3 pts
   const destructiveButtons = page.buttons.filter((b) => isDestructiveText(b.text));

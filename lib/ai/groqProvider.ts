@@ -57,15 +57,10 @@ async function explainControl(context: AiControlContext): Promise<AiControlInsig
       }),
     });
 
-    if (!res.ok) {
-      const bodyText = await res.text().catch(() => "(couldn't read body)");
-      console.log("[AI DEBUG] Groq response not ok. Status:", res.status, "Body:", bodyText);
-      return null;
-    }
+    if (!res.ok) return null;
 
     const data = await res.json();
     const raw = data?.choices?.[0]?.message?.content;
-    console.log("[AI DEBUG] Groq raw content:", raw);
     if (typeof raw !== "string") return null;
 
     let parsed: unknown;
@@ -75,10 +70,7 @@ async function explainControl(context: AiControlContext): Promise<AiControlInsig
       return null;
     }
 
-    if (!isValidInsightShape(parsed)) {
-      console.log("[AI DEBUG] Parsed JSON failed shape validation:", JSON.stringify(parsed));
-      return null;
-    }
+    if (!isValidInsightShape(parsed)) return null;
 
     return {
       controlText: context.controlText,
@@ -87,8 +79,7 @@ async function explainControl(context: AiControlContext): Promise<AiControlInsig
       explanation: parsed.explanation.trim(),
       recommendation: parsed.recommendation.trim(),
     };
-  } catch (err) {
-    console.log("[AI DEBUG] fetch to Groq threw:", err);
+  } catch {
     // Network error, timeout, abort — the audit continues without this insight.
     return null;
   } finally {

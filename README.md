@@ -196,3 +196,25 @@ the failure paths that matter):
 
 **Not yet tested:** an actual successful Groq response, since that needs your real key and
 this sandbox can't reach api.groq.com. Test that path locally with `npm run dev`.
+
+## Etap 8 — testy na realnych stronach (poprawki z realnych wyników)
+
+Przetestowane na żywo: github.com, zalando.pl, stackoverflow.blog, notion.com, linear.app,
+test-page.html, plus syntetyczna pusta strona. **Zero crashy na żadnej.**
+
+Dwie realne poprawki wynikłe z testów:
+
+1. **Sklejone słowa w tekście** (np. "wyobrazićModa" zamiast "wyobrazić Moda") — `.text()` w cheerio
+   łączy zagnieżdżone elementy bez spacji, gdy w źródłowym HTML nie ma białych znaków między tagami
+   (częste w komponentowych, nowoczesnych stronach). Naprawione przez `readableText()` w
+   `lib/parser.ts` — rekurencyjnie łączy tekst dzieci ze spacjami. Dotyczy nagłówków, tytułu strony,
+   accessible name przycisków/linków.
+
+2. **Usunięty nieuczciwy check** `actions.state-exposed` ("Control state isn't exposed
+   programmatically") — flagował niemal każdy przycisk na **każdej** przetestowanej stronie,
+   łącznie z bardzo dobrze zrobionym linear.app (83/100). To był szum, nie sygnał: większość
+   przycisków po prostu nie potrzebuje eksponowanego stanu (to dotyczy tylko toggle'i,
+   rozwijanych paneli itp.), a statyczna analiza nie potrafi wiarygodnie odróżnić, który
+   przycisk tego wymaga. Zamieniony na uczciwe `"na"` z wyjaśnieniem zamiast fałszywie
+   punktować. Efekt: github.com 87→89, Actions & Controls 93.5%→100% (bo to był jedyny
+   check psujący tę kategorię na dobrych stronach).
